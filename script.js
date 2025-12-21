@@ -1,161 +1,76 @@
 // ============================================
-// ДАННЫЕ О МЕСТАХ (захардкоженные)
+// КОНФИГУРАЦИЯ API
 // ============================================
-const places = [
-    {
-        id: 1,
-        name: "Красная площадь",
-        description: "Главная площадь Москвы, символ России. Здесь находятся Кремль, Собор Василия Блаженного и Мавзолей Ленина.",
-        lat: 55.7539,
-        lng: 37.6208,
-        city: "Москва"
-    },
-    {
-        id: 2,
-        name: "Эрмитаж",
-        description: "Один из крупнейших художественных музеев мира, расположенный в Санкт-Петербурге. Более 3 миллионов экспонатов.",
-        lat: 59.9398,
-        lng: 30.3146,
-        city: "Санкт-Петербург"
-    },
-    {
-        id: 3,
-        name: "Озеро Байкал",
-        description: "Самое глубокое озеро в мире, объект Всемирного наследия ЮНЕСКО. Уникальная природа и чистейшая вода.",
-        lat: 53.4125,
-        lng: 108.1681,
-        city: "Иркутская область"
-    },
-    {
-        id: 4,
-        name: "Кижи",
-        description: "Музей-заповедник деревянного зодчества на острове в Онежском озере. Знаменит Преображенской церковью.",
-        lat: 62.0667,
-        lng: 35.2167,
-        city: "Карелия"
-    },
-    {
-        id: 5,
-        name: "Долина гейзеров",
-        description: "Единственное гейзерное поле в Евразии, расположенное на Камчатке. Уникальная природная достопримечательность.",
-        lat: 54.4306,
-        lng: 160.1394,
-        city: "Камчатка"
-    },
-    {
-        id: 6,
-        name: "Мамаев курган",
-        description: "Мемориальный комплекс в Волгограде, посвящённый Сталинградской битве. Главный монумент — «Родина-мать зовёт!»",
-        lat: 48.7425,
-        lng: 44.5370,
-        city: "Волгоград"
-    },
-    {
-        id: 7,
-        name: "Собор Василия Блаженного",
-        description: "Православный храм на Красной площади в Москве, один из самых узнаваемых символов России.",
-        lat: 55.7525,
-        lng: 37.6231,
-        city: "Москва"
-    },
-    {
-        id: 8,
-        name: "Петергоф",
-        description: "Дворцово-парковый ансамбль под Санкт-Петербургом, знаменитый своими фонтанами и парками.",
-        lat: 59.8833,
-        lng: 29.9000,
-        city: "Санкт-Петербург"
-    },
-    {
-        id: 9,
-        name: "Кунгурская пещера",
-        description: "Одна из самых известных пещер Урала. Подземные озёра, сталактиты и сталагмиты создают фантастический пейзаж.",
-        lat: 57.4333,
-        lng: 57.0000,
-        city: "Пермский край"
-    },
-    {
-        id: 10,
-        name: "Алтайские горы",
-        description: "Горная система на юге Сибири с уникальной природой, чистыми озёрами и богатой флорой и фауной.",
-        lat: 50.0000,
-        lng: 86.0000,
-        city: "Алтай"
-    },
-    {
-        id: 11,
-        name: "Сочи",
-        description: "Курортный город на Чёрном море, столица зимних Олимпийских игр 2014 года. Пляжи, горы и парки.",
-        lat: 43.6028,
-        lng: 39.7342,
-        city: "Краснодарский край"
-    },
-    {
-        id: 12,
-        name: "Калининград",
-        description: "Западный форпост России, бывший Кёнигсберг. Уникальная архитектура и история, связанная с Пруссией.",
-        lat: 54.7104,
-        lng: 20.4522,
-        city: "Калининград"
-    },
-    {
-        id: 13,
-        name: "Казанский Кремль",
-        description: "Историческая крепость в Казани, объект Всемирного наследия ЮНЕСКО. Симбиоз русской и татарской культур.",
-        lat: 55.7989,
-        lng: 49.1053,
-        city: "Казань"
-    },
-    {
-        id: 14,
-        name: "Золотое кольцо России",
-        description: "Туристический маршрут по древним городам: Сергиев Посад, Переславль-Залесский, Ростов, Ярославль и другие.",
-        lat: 57.6299,
-        lng: 39.8737,
-        city: "Ярославль"
-    },
-    {
-        id: 15,
-        name: "Эльбрус",
-        description: "Высочайшая вершина России и Европы (5642 м). Популярное место для альпинизма и горнолыжного спорта.",
-        lat: 43.3550,
-        lng: 42.4392,
-        city: "Кабардино-Балкария"
-    }
-];
+// Автоматически определяем URL API (работает и локально, и в Docker)
+const API_BASE_URL = window.location.origin + '/api';
 
 // ============================================
 // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
 // ============================================
 let map = null;
 let markers = [];
+let places = [];  // Загружаются с сервера
 let route = [];
 let currentPlace = null;
+let authToken = null;
+let currentUsername = null;
 
 // ============================================
 // ИНИЦИАЛИЗАЦИЯ ПРИЛОЖЕНИЯ
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
-    // Загрузка маршрута из localStorage
-    loadRoute();
+    // Проверяем, есть ли сохранённый токен
+    const savedToken = localStorage.getItem('travelmap-token');
+    const savedUsername = localStorage.getItem('travelmap-username');
+    
+    if (savedToken && savedUsername) {
+        // Пользователь уже авторизован
+        authToken = savedToken;
+        currentUsername = savedUsername;
+        showApp();
+    } else {
+        // Показываем экран авторизации
+        showAuthScreen();
+    }
     
     // Обработчики событий
     setupEventListeners();
-    
-    // Инициализация карты (будет вызвана при открытии)
-    // Карта инициализируется при нажатии на кнопку "Открыть карту"
 });
 
 // ============================================
 // ОБРАБОТЧИКИ СОБЫТИЙ
 // ============================================
 function setupEventListeners() {
-    // Кнопка "Открыть карту" на главном экране
-    document.getElementById('open-map-btn').addEventListener('click', function() {
-        document.getElementById('welcome-screen').classList.remove('active');
-        document.getElementById('app').classList.add('active');
-        initMap();
+    // Переключение между формой входа и регистрации
+    document.getElementById('show-register').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('login-form').classList.remove('active');
+        document.getElementById('register-form').classList.add('active');
     });
+    
+    document.getElementById('show-login').addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('register-form').classList.remove('active');
+        document.getElementById('login-form').classList.add('active');
+    });
+    
+    // Кнопка входа
+    document.getElementById('login-btn').addEventListener('click', handleLogin);
+    
+    // Кнопка регистрации
+    document.getElementById('register-btn').addEventListener('click', handleRegister);
+    
+    // Вход по Enter
+    document.getElementById('login-password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') handleLogin();
+    });
+    
+    document.getElementById('register-password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') handleRegister();
+    });
+    
+    // Кнопка выхода
+    document.getElementById('logout-btn').addEventListener('click', handleLogout);
     
     // Навигация между страницами
     document.querySelectorAll('.nav-link').forEach(link => {
@@ -188,7 +103,6 @@ function setupEventListeners() {
     // Просмотр маршрута на карте
     document.getElementById('view-route-on-map').addEventListener('click', function() {
         switchPage('map');
-        // Небольшая задержка, чтобы карта успела отобразиться
         setTimeout(function() {
             if (map) {
                 showRouteOnMap();
@@ -198,18 +112,238 @@ function setupEventListeners() {
 }
 
 // ============================================
+// АВТОРИЗАЦИЯ
+// ============================================
+async function handleLogin() {
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+    const errorDiv = document.getElementById('login-error');
+    
+    if (!username || !password) {
+        showError(errorDiv, 'Заполните все поля');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Успешный вход
+            authToken = data.token;
+            currentUsername = data.username;
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('travelmap-token', authToken);
+            localStorage.setItem('travelmap-username', currentUsername);
+            
+            // Показываем приложение
+            showApp();
+        } else {
+            showError(errorDiv, data.error || 'Ошибка входа');
+        }
+    } catch (error) {
+        showError(errorDiv, 'Ошибка соединения с сервером');
+        console.error('Login error:', error);
+    }
+}
+
+async function handleRegister() {
+    const username = document.getElementById('register-username').value.trim();
+    const password = document.getElementById('register-password').value;
+    const errorDiv = document.getElementById('register-error');
+    
+    if (!username || !password) {
+        showError(errorDiv, 'Заполните все поля');
+        return;
+    }
+    
+    if (password.length < 4) {
+        showError(errorDiv, 'Пароль должен быть не менее 4 символов');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Успешная регистрация, переключаемся на форму входа
+            document.getElementById('register-form').classList.remove('active');
+            document.getElementById('login-form').classList.add('active');
+            document.getElementById('login-username').value = username;
+            showError(document.getElementById('login-error'), 'Регистрация успешна! Войдите в систему.');
+        } else {
+            showError(errorDiv, data.error || 'Ошибка регистрации');
+        }
+    } catch (error) {
+        showError(errorDiv, 'Ошибка соединения с сервером');
+        console.error('Register error:', error);
+    }
+}
+
+function handleLogout() {
+    if (confirm('Вы уверены, что хотите выйти?')) {
+        authToken = null;
+        currentUsername = null;
+        localStorage.removeItem('travelmap-token');
+        localStorage.removeItem('travelmap-username');
+        showAuthScreen();
+    }
+}
+
+function showError(errorDiv, message) {
+    errorDiv.textContent = message;
+    errorDiv.classList.remove('hidden');
+}
+
+function showAuthScreen() {
+    document.getElementById('auth-screen').classList.add('active');
+    document.getElementById('app').classList.remove('active');
+    // Очищаем формы
+    document.getElementById('login-username').value = '';
+    document.getElementById('login-password').value = '';
+    document.getElementById('register-username').value = '';
+    document.getElementById('register-password').value = '';
+    document.getElementById('login-error').classList.add('hidden');
+    document.getElementById('register-error').classList.add('hidden');
+}
+
+function showApp() {
+    document.getElementById('auth-screen').classList.remove('active');
+    document.getElementById('app').classList.add('active');
+    document.getElementById('username-display').textContent = currentUsername;
+    
+    // Загружаем данные и инициализируем карту
+    loadPlaces();
+    loadRoute();
+    initMap();
+}
+
+// ============================================
+// РАБОТА С API
+// ============================================
+async function loadPlaces() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/places`);
+        if (response.ok) {
+            places = await response.json();
+            // Обновляем карту, если она уже инициализирована
+            if (map) {
+                updateMapMarkers();
+            }
+        } else {
+            console.error('Ошибка загрузки мест');
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки мест:', error);
+    }
+}
+
+async function loadRoute() {
+    if (!authToken) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/routes`, {
+            headers: {
+                'Authorization': authToken
+            }
+        });
+        
+        if (response.ok) {
+            const routes = await response.json();
+            if (routes.length > 0) {
+                route = routes[0].places || [];
+            } else {
+                route = [];
+            }
+            
+            // Обновляем отображение маршрута
+            if (document.getElementById('page-route').classList.contains('active')) {
+                renderRouteList();
+            }
+        } else {
+            console.error('Ошибка загрузки маршрута');
+            route = [];
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки маршрута:', error);
+        route = [];
+    }
+}
+
+async function saveRoute() {
+    if (!authToken) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/routes`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': authToken
+            },
+            body: JSON.stringify({ places: route })
+        });
+        
+        if (!response.ok) {
+            console.error('Ошибка сохранения маршрута');
+        }
+    } catch (error) {
+        console.error('Ошибка сохранения маршрута:', error);
+    }
+}
+
+async function clearRoute() {
+    if (!authToken) return;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/routes`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': authToken
+            }
+        });
+        
+        if (response.ok) {
+            route = [];
+            if (map) {
+                map.eachLayer(function(layer) {
+                    if (layer instanceof L.Polyline) {
+                        map.removeLayer(layer);
+                    }
+                });
+            }
+            renderRouteList();
+        }
+    } catch (error) {
+        console.error('Ошибка очистки маршрута:', error);
+    }
+}
+
+// ============================================
 // НАВИГАЦИЯ МЕЖДУ СТРАНИЦАМИ
 // ============================================
 function switchPage(pageName) {
-    // Скрываем все страницы
     document.querySelectorAll('.page').forEach(page => {
         page.classList.remove('active');
     });
     
-    // Показываем выбранную страницу
     document.getElementById('page-' + pageName).classList.add('active');
     
-    // Обновляем активную ссылку в навигации
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
         if (link.getAttribute('data-page') === pageName) {
@@ -217,7 +351,6 @@ function switchPage(pageName) {
         }
     });
     
-    // Если открываем страницу маршрута, обновляем список
     if (pageName === 'route') {
         renderRouteList();
     }
@@ -227,36 +360,42 @@ function switchPage(pageName) {
 // ИНИЦИАЛИЗАЦИЯ КАРТЫ
 // ============================================
 function initMap() {
-    // Проверяем, не инициализирована ли карта уже
     if (map) {
         return;
     }
     
-    // Создаём карту, центрированную на России
     map = L.map('map').setView([61.0, 99.0], 4);
     
-    // Добавляем слой карты OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19
     }).addTo(map);
     
-    // Добавляем метки всех мест
-    places.forEach(place => {
-        addMarker(place);
-    });
+    // Добавляем метки после загрузки мест
+    if (places.length > 0) {
+        updateMapMarkers();
+    }
     
-    // Если есть сохранённый маршрут, показываем его
     if (route.length > 0) {
         showRouteOnMap();
     }
+}
+
+function updateMapMarkers() {
+    // Удаляем старые метки
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+    
+    // Добавляем новые метки
+    places.forEach(place => {
+        addMarker(place);
+    });
 }
 
 // ============================================
 // ДОБАВЛЕНИЕ МЕТКИ НА КАРТУ
 // ============================================
 function addMarker(place) {
-    // Создаём иконку для метки
     const icon = L.icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -266,7 +405,6 @@ function addMarker(place) {
         shadowSize: [41, 41]
     });
     
-    // Создаём метку
     const marker = L.marker([place.lat, place.lng], { icon: icon })
         .addTo(map)
         .bindPopup(`<b>${place.name}</b><br>${place.city}`)
@@ -285,7 +423,6 @@ function showPlaceCard(place) {
     document.getElementById('place-name').textContent = place.name;
     document.getElementById('place-description').textContent = place.description;
     
-    // Проверяем, есть ли уже это место в маршруте
     const isInRoute = route.some(p => p.id === place.id);
     const addBtn = document.getElementById('add-to-route');
     
@@ -306,54 +443,31 @@ function showPlaceCard(place) {
 // РАБОТА С МАРШРУТОМ
 // ============================================
 function addToRoute(place) {
-    // Проверяем, нет ли уже этого места в маршруте
     if (route.some(p => p.id === place.id)) {
         alert('Это место уже в маршруте!');
         return;
     }
     
-    // Добавляем место в маршрут
     route.push(place);
-    
-    // Сохраняем в localStorage
     saveRoute();
     
-    // Обновляем отображение маршрута на карте
     if (map) {
         showRouteOnMap();
     }
     
-    // Обновляем список маршрута, если открыта страница маршрута
     if (document.getElementById('page-route').classList.contains('active')) {
         renderRouteList();
     }
     
-    // Показываем сообщение
     alert(`"${place.name}" добавлено в маршрут!`);
 }
 
-function removeFromRoute(placeId) {
+async function removeFromRoute(placeId) {
     route = route.filter(p => p.id !== placeId);
-    saveRoute();
+    await saveRoute();
     
     if (map) {
         showRouteOnMap();
-    }
-    
-    renderRouteList();
-}
-
-function clearRoute() {
-    route = [];
-    saveRoute();
-    
-    if (map) {
-        // Удаляем линию маршрута с карты
-        map.eachLayer(function(layer) {
-            if (layer instanceof L.Polyline) {
-                map.removeLayer(layer);
-            }
-        });
     }
     
     renderRouteList();
@@ -367,14 +481,12 @@ function showRouteOnMap() {
         return;
     }
     
-    // Удаляем старую линию маршрута
     map.eachLayer(function(layer) {
         if (layer instanceof L.Polyline) {
             map.removeLayer(layer);
         }
     });
     
-    // Если в маршруте больше одного места, рисуем линию
     if (route.length > 1) {
         const routePoints = route.map(place => [place.lat, place.lng]);
         
@@ -385,11 +497,9 @@ function showRouteOnMap() {
             smoothFactor: 1
         }).addTo(map);
         
-        // Подгоняем карту, чтобы показать весь маршрут
         const group = new L.featureGroup([routeLine]);
         map.fitBounds(group.getBounds().pad(0.1));
     } else if (route.length === 1) {
-        // Если только одно место, центрируем карту на нём
         map.setView([route[0].lat, route[0].lng], 8);
     }
 }
@@ -415,23 +525,3 @@ function renderRouteList() {
         </div>
     `).join('');
 }
-
-// ============================================
-// СОХРАНЕНИЕ И ЗАГРУЗКА МАРШРУТА
-// ============================================
-function saveRoute() {
-    localStorage.setItem('travelmap-route', JSON.stringify(route));
-}
-
-function loadRoute() {
-    const saved = localStorage.getItem('travelmap-route');
-    if (saved) {
-        try {
-            route = JSON.parse(saved);
-        } catch (e) {
-            console.error('Ошибка загрузки маршрута:', e);
-            route = [];
-        }
-    }
-}
-

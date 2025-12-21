@@ -1,0 +1,21 @@
+services:
+  # Backend сервис (Flask API)
+  backend:
+    build: .
+    container_name: travelmap-backend
+    ports:
+      - "5001:5000"  # Используем порт 5001 на хосте, т.к. 5000 занят macOS AirPlay
+    volumes:
+      # Монтируем папку data для сохранения данных между перезапусками
+      - ./data:/app/data
+    environment:
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/api/places')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
