@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelMap Russia - Планирование туристических маршрутов</title>
+    
+    <!-- Leaflet CSS для карты -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Наши стили -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Главный экран (приветствие) -->
+    <div id="welcome-screen" class="screen active">
+        <div class="welcome-content">
+            <h1>🗺️ TravelMap Russia</h1>
+            <p>Планируйте свои туристические маршруты по России</p>
+            <button id="open-map-btn" class="btn-primary">Открыть карту</button>
+        </div>
+    </div>
+
+    <!-- Основное приложение -->
+    <div id="app" class="screen">
+        <!-- Навигация -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <h2 class="nav-logo">🗺️ TravelMap Russia</h2>
+                <div class="nav-links">
+                    <button class="nav-link active" data-page="map">Карта</button>
+                    <button class="nav-link" data-page="route">Мой маршрут</button>
+                    <button class="nav-link" data-page="about">О проекте</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Страница: Карта -->
+        <div id="page-map" class="page active">
+            <div class="map-container">
+                <!-- Контейнер для карты -->
+                <div id="map"></div>
+                
+                <!-- Карточка места (появляется при клике на метку) -->
+                <div id="place-card" class="place-card hidden">
+                    <button class="close-btn" id="close-card">×</button>
+                    <h3 id="place-name"></h3>
+                    <p id="place-description"></p>
+                    <button id="add-to-route" class="btn-primary">Добавить в маршрут</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Страница: Мой маршрут -->
+        <div id="page-route" class="page">
+            <div class="route-container">
+                <h2>Мой маршрут</h2>
+                <div id="route-list" class="route-list">
+                    <p class="empty-message">Маршрут пуст. Добавьте места на карте!</p>
+                </div>
+                <div class="route-actions">
+                    <button id="clear-route" class="btn-secondary">Очистить маршрут</button>
+                    <button id="view-route-on-map" class="btn-primary">Посмотреть на карте</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Страница: О проекте -->
+        <div id="page-about" class="page">
+            <div class="about-container">
+                <h2>О проекте TravelMap Russia</h2>
+                <div class="about-content">
+                    <p>
+                        <strong>TravelMap Russia</strong> — это простое веб-приложение для планирования 
+                        туристических маршрутов по России.
+                    </p>
+                    <h3>Возможности:</h3>
+                    <ul>
+                        <li>Интерактивная карта России с интересными местами</li>
+                        <li>Просмотр информации о достопримечательностях</li>
+                        <li>Создание собственного маршрута</li>
+                        <li>Сохранение маршрута в браузере</li>
+                    </ul>
+                    <h3>Технологии:</h3>
+                    <ul>
+                        <li>HTML, CSS, JavaScript</li>
+                        <li>Leaflet — библиотека для карт</li>
+                        <li>OpenStreetMap — картографические данные</li>
+                    </ul>
+                    <p class="footer-note">
+                        Проект создан для демонстрации возможностей веб-разработки.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript для карты -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Наш JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
+
