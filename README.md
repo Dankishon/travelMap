@@ -11,7 +11,7 @@
 
 ### Frontend
 - HTML5, CSS3, JavaScript (ES6+)
-- Leaflet.js для интерактивных карт
+- MapLibre GL JS для интерактивных карт (открытая альтернатива Mapbox GL)
 - OpenStreetMap для картографических данных
 
 ### Backend

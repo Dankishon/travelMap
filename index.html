@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TravelMap Russia - Планирование туристических маршрутов</title>
     
-    <!-- Leaflet CSS для карты -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    
+    <!-- MapLibre GL JS CSS -->
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
     
     <!-- Наши стили -->
     <link rel="stylesheet" href="style.css">
@@ -14,120 +18,233 @@
 <body>
     <!-- Экран входа/регистрации -->
     <div id="auth-screen" class="screen active">
-        <div class="auth-container">
-            <div class="auth-content">
-                <h1>🗺️ TravelMap Russia</h1>
-                <p>Планируйте свои туристические маршруты по России</p>
-                
-                <!-- Форма входа -->
-                <div id="login-form" class="auth-form active">
-                    <h2>Вход</h2>
-                    <div id="login-error" class="error-message hidden"></div>
-                    <input type="text" id="login-username" placeholder="Имя пользователя" required>
-                    <input type="password" id="login-password" placeholder="Пароль" required>
-                    <button id="login-btn" class="btn-primary">Войти</button>
-                    <p class="auth-switch">
-                        Нет аккаунта? <a href="#" id="show-register">Зарегистрироваться</a>
-                    </p>
-                </div>
-                
-                <!-- Форма регистрации -->
-                <div id="register-form" class="auth-form">
-                    <h2>Регистрация</h2>
-                    <div id="register-error" class="error-message hidden"></div>
-                    <input type="text" id="register-username" placeholder="Имя пользователя" required>
-                    <input type="password" id="register-password" placeholder="Пароль (мин. 4 символа)" required>
-                    <button id="register-btn" class="btn-primary">Зарегистрироваться</button>
-                    <p class="auth-switch">
-                        Уже есть аккаунт? <a href="#" id="show-login">Войти</a>
-                    </p>
+        <div class="container-fluid d-flex align-items-center justify-content-center min-vh-100 auth-background">
+            <div class="col-12 col-md-5 col-lg-4">
+                <div class="card shadow-lg border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-4">
+                            <h1 class="display-5 fw-bold text-primary mb-2">
+                                <i class="bi bi-geo-alt-fill"></i> TravelMap Russia
+                            </h1>
+                            <p class="text-muted">Планируйте свои туристические маршруты по России</p>
+                        </div>
+                        
+                        <!-- Форма входа -->
+                        <div id="login-form" class="auth-form active">
+                            <h3 class="text-center mb-4">Вход</h3>
+                            <div id="login-error" class="alert alert-danger d-none" role="alert"></div>
+                            
+                            <div class="mb-3">
+                                <label for="login-username" class="form-label">Имя пользователя</label>
+                                <input type="text" class="form-control form-control-lg" id="login-username" 
+                                       placeholder="Введите имя пользователя" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="login-password" class="form-label">Пароль</label>
+                                <input type="password" class="form-control form-control-lg" id="login-password" 
+                                       placeholder="Введите пароль" required>
+                            </div>
+                            
+                            <button id="login-btn" class="btn btn-primary btn-lg w-100 mb-3">
+                                <i class="bi bi-box-arrow-in-right"></i> Войти
+                            </button>
+                            
+                            <div class="text-center">
+                                <p class="text-muted mb-0">
+                                    Нет аккаунта? 
+                                    <a href="#" id="show-register" class="text-decoration-none fw-bold">Зарегистрироваться</a>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Форма регистрации -->
+                        <div id="register-form" class="auth-form d-none">
+                            <h3 class="text-center mb-4">Регистрация</h3>
+                            <div id="register-error" class="alert alert-danger d-none" role="alert"></div>
+                            
+                            <div class="mb-3">
+                                <label for="register-username" class="form-label">Имя пользователя</label>
+                                <input type="text" class="form-control form-control-lg" id="register-username" 
+                                       placeholder="Введите имя пользователя" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="register-password" class="form-label">Пароль</label>
+                                <input type="password" class="form-control form-control-lg" id="register-password" 
+                                       placeholder="Минимум 4 символа" required>
+                                <div class="form-text">Пароль должен содержать не менее 4 символов</div>
+                            </div>
+                            
+                            <button id="register-btn" class="btn btn-primary btn-lg w-100 mb-3">
+                                <i class="bi bi-person-plus"></i> Зарегистрироваться
+                            </button>
+                            
+                            <div class="text-center">
+                                <p class="text-muted mb-0">
+                                    Уже есть аккаунт? 
+                                    <a href="#" id="show-login" class="text-decoration-none fw-bold">Войти</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Основное приложение -->
-    <div id="app" class="screen">
+    <div id="app" class="screen d-none">
         <!-- Навигация -->
-        <nav class="navbar">
-            <div class="nav-container">
-                <h2 class="nav-logo">🗺️ TravelMap Russia</h2>
-                <div class="nav-right">
-                    <div class="nav-links">
-                        <button class="nav-link active" data-page="map">Карта</button>
-                        <button class="nav-link" data-page="route">Мой маршрут</button>
-                        <button class="nav-link" data-page="about">О проекте</button>
-                    </div>
-                    <div class="user-info">
-                        <span id="username-display"></span>
-                        <button id="logout-btn" class="btn-secondary">Выйти</button>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" href="#">
+                    <i class="bi bi-geo-alt-fill"></i> TravelMap Russia
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-page="map" id="nav-map">
+                                <i class="bi bi-map"></i> Карта
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-page="route" id="nav-route">
+                                <i class="bi bi-list-ul"></i> Мой маршрут
+                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-page="about" id="nav-about">
+                                <i class="bi bi-info-circle"></i> О проекте
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="text-white">
+                            <i class="bi bi-person-circle"></i> <span id="username-display"></span>
+                        </span>
+                        <button id="logout-btn" class="btn btn-outline-light btn-sm">
+                            <i class="bi bi-box-arrow-right"></i> Выйти
+                        </button>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <!-- Страница: Карта -->
+        <!-- Страница: Карта (полноэкранная) -->
         <div id="page-map" class="page active">
-            <div class="map-container">
+            <div class="map-container-fullscreen">
                 <!-- Контейнер для карты -->
                 <div id="map"></div>
                 
                 <!-- Карточка места (появляется при клике на метку) -->
-                <div id="place-card" class="place-card hidden">
-                    <button class="close-btn" id="close-card">×</button>
-                    <h3 id="place-name"></h3>
-                    <p id="place-description"></p>
-                    <button id="add-to-route" class="btn-primary">Добавить в маршрут</button>
+                <div id="place-card" class="card shadow-lg border-0 place-card d-none">
+                    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0" id="place-name"></h5>
+                        <button type="button" class="btn-close btn-close-white" id="close-card"></button>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text text-muted" id="place-description"></p>
+                        <p class="text-muted small mb-3">
+                            <i class="bi bi-geo-alt"></i> <span id="place-city"></span>
+                        </p>
+                        <button id="add-to-route" class="btn btn-primary w-100">
+                            <i class="bi bi-plus-circle"></i> Добавить в маршрут
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Страница: Мой маршрут -->
-        <div id="page-route" class="page">
-            <div class="route-container">
-                <h2>Мой маршрут</h2>
-                <div id="route-list" class="route-list">
-                    <p class="empty-message">Маршрут пуст. Добавьте места на карте!</p>
-                </div>
-                <div class="route-actions">
-                    <button id="clear-route" class="btn-secondary">Очистить маршрут</button>
-                    <button id="view-route-on-map" class="btn-primary">Посмотреть на карте</button>
+        <div id="page-route" class="page d-none">
+            <div class="container my-4">
+                <div class="row">
+                    <div class="col-12">
+                        <h2 class="mb-4">
+                            <i class="bi bi-list-ul"></i> Мой маршрут
+                        </h2>
+                        <div id="route-list" class="mb-4">
+                            <div class="alert alert-info" role="alert">
+                                <i class="bi bi-info-circle"></i> Маршрут пуст. Добавьте места на карте!
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button id="clear-route" class="btn btn-outline-danger">
+                                <i class="bi bi-trash"></i> Очистить маршрут
+                            </button>
+                            <button id="view-route-on-map" class="btn btn-primary">
+                                <i class="bi bi-map"></i> Посмотреть на карте
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Страница: О проекте -->
-        <div id="page-about" class="page">
-            <div class="about-container">
-                <h2>О проекте TravelMap Russia</h2>
-                <div class="about-content">
-                    <p>
-                        <strong>TravelMap Russia</strong> — это простое веб-приложение для планирования 
-                        туристических маршрутов по России.
-                    </p>
-                    <h3>Возможности:</h3>
-                    <ul>
-                        <li>Интерактивная карта России с интересными местами</li>
-                        <li>Просмотр информации о достопримечательностях</li>
-                        <li>Создание собственного маршрута</li>
-                        <li>Сохранение маршрута в браузере</li>
-                    </ul>
-                    <h3>Технологии:</h3>
-                    <ul>
-                        <li>HTML, CSS, JavaScript</li>
-                        <li>Leaflet — библиотека для карт</li>
-                        <li>OpenStreetMap — картографические данные</li>
-                    </ul>
-                    <p class="footer-note">
-                        Проект создан для демонстрации возможностей веб-разработки.
-                    </p>
+        <div id="page-about" class="page d-none">
+            <div class="container my-4">
+                <div class="row justify-content-center">
+                    <div class="col-12 col-md-8">
+                        <div class="card shadow-sm">
+                            <div class="card-body p-4">
+                                <h2 class="card-title mb-4">
+                                    <i class="bi bi-info-circle text-primary"></i> О проекте TravelMap Russia
+                                </h2>
+                                <p class="card-text">
+                                    <strong>TravelMap Russia</strong> — это простое веб-приложение для планирования 
+                                    туристических маршрутов по России.
+                                </p>
+                                <h5 class="mt-4 mb-3">Возможности:</h5>
+                                <ul class="list-group list-group-flush mb-4">
+                                    <li class="list-group-item">
+                                        <i class="bi bi-check-circle text-success"></i> Интерактивная карта России с интересными местами
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="bi bi-check-circle text-success"></i> Просмотр информации о достопримечательностях
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="bi bi-check-circle text-success"></i> Создание собственного маршрута
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="bi bi-check-circle text-success"></i> Сохранение маршрута на сервере
+                                    </li>
+                                </ul>
+                                <h5 class="mt-4 mb-3">Технологии:</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">HTML, CSS, JavaScript</li>
+                                    <li class="list-group-item">Bootstrap 5 — фреймворк для интерфейса</li>
+                                    <li class="list-group-item">MapLibre GL JS — библиотека для интерактивных карт</li>
+                                    <li class="list-group-item">OpenStreetMap — картографические данные</li>
+                                    <li class="list-group-item">Flask — backend сервер</li>
+                                </ul>
+                                <div class="alert alert-light mt-4 mb-0" role="alert">
+                                    <small class="text-muted">
+                                        Проект создан для демонстрации возможностей веб-разработки.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Leaflet JavaScript для карты -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- MapLibre GL JS для карты -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    
+    <!-- Toast контейнер для уведомлений -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 11000;">
+        <div id="toast-container"></div>
+    </div>
     
     <!-- Наш JavaScript -->
     <script src="script.js"></script>
