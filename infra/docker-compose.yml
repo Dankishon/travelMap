@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: travelmap-postgres
+    environment:
+      POSTGRES_USER: travelmap
+      POSTGRES_PASSWORD: travelmap123
+      POSTGRES_DB: travelmap
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U travelmap"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ../apps/api
+      dockerfile: Dockerfile
+    container_name: travelmap-api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://travelmap:travelmap123@postgres:5432/travelmap
+      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      CORS_ORIGINS: '["http://localhost:5173","http://localhost:80"]'
+      DEBUG: ${DEBUG:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ../apps/api:/app
+    working_dir: /app
+    command: >
+      sh -c "
+        alembic upgrade head &&
+        python init_places.py &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  web:
+    build:
+      context: ../apps/web
+      dockerfile: Dockerfile
+    container_name: travelmap-web
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+    environment:
+      VITE_API_URL: http://localhost:8000/api/v1
+
+volumes:
+  postgres_data:
+
