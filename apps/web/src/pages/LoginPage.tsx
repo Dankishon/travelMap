@@ -1,21 +1,40 @@
 /** Страница входа/регистрации */
 import { useState } from 'react'
+import { AxiosError } from 'axios'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 
 export default function LoginPage() {
   const [isLogin, setIsLogin] = useState(true)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [message, setMessage] = useState('')
   const { login, register, isLoading, error } = useAuth()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    setMessage('')
     if (isLogin) {
       login({ username, password })
     } else {
-      register({ username, password })
+      register(
+        { username, password },
+        {
+          onSuccess: () => {
+            setIsLogin(true)
+            setPassword('')
+            setMessage('Регистрация прошла успешно. Теперь войдите в аккаунт.')
+          },
+        }
+      )
     }
   }
+
+  const errorMessage =
+    error instanceof AxiosError
+      ? error.response?.data?.detail || error.message
+      : error instanceof Error
+        ? error.message
+        : 'Произошла ошибка'
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
@@ -29,6 +48,7 @@ export default function LoginPage() {
 
         <div className="flex gap-2 mb-6">
           <button
+            type="button"
             onClick={() => setIsLogin(true)}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
               isLogin
@@ -39,6 +59,7 @@ export default function LoginPage() {
             Вход
           </button>
           <button
+            type="button"
             onClick={() => setIsLogin(false)}
             className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
               !isLogin
@@ -53,7 +74,13 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-              {error instanceof Error ? error.message : 'Произошла ошибка'}
+              {errorMessage}
+            </div>
+          )}
+
+          {message && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+              {message}
             </div>
           )}
 

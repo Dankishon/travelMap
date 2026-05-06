@@ -1,11 +1,12 @@
 /** API клиент на axios */
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1'
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api/v1'
 
 // Создаём экземпляр axios
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,7 +30,13 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    if (error.response?.status === 401) {
+    const originalRequest = error.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined
+    const isAuthRequest = originalRequest?.url?.includes('/auth/')
+
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isAuthRequest) {
+      originalRequest._retry = true
       // Пытаемся обновить токен
       const refreshToken = localStorage.getItem('refresh_token')
       if (refreshToken) {
@@ -44,11 +51,9 @@ apiClient.interceptors.response.use(
           const { access_token } = response.data
           localStorage.setItem('access_token', access_token)
           // Повторяем оригинальный запрос
-          if (error.config) {
-            error.config.headers = error.config.headers || {}
-            error.config.headers.Authorization = `Bearer ${access_token}`
-            return apiClient.request(error.config)
-          }
+          originalRequest.headers = originalRequest.headers || {}
+          originalRequest.headers.Authorization = `Bearer ${access_token}`
+          return apiClient.request(originalRequest)
         } catch (refreshError) {
           // Refresh токен невалиден, очищаем и редиректим на логин
           localStorage.removeItem('access_token')
