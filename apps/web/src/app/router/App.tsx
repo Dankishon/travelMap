@@ -7,10 +7,22 @@ import RoutesPage from '@/pages/RoutesPage'
 import Layout from './Layout'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth()
+  const { user, isCheckingAuth } = useAuth()
   const token = localStorage.getItem('access_token')
 
-  if (!token || !user) {
+  if (!token) {
+    return <Navigate to="/login" replace />
+  }
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-700">
+        Загрузка...
+      </div>
+    )
+  }
+
+  if (!user) {
     return <Navigate to="/login" replace />
   }
 

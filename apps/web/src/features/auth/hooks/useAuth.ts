@@ -35,7 +35,7 @@ export const useAuth = () => {
     },
   })
 
-  const { data: user } = useQuery({
+  const { data: user, isLoading: isCheckingAuth } = useQuery({
     queryKey: ['auth', 'me'],
     queryFn: authApi.getMe,
     enabled: !!authStorage.getAccessToken(),
@@ -44,6 +44,7 @@ export const useAuth = () => {
 
   return {
     user,
+    isCheckingAuth,
     login: loginMutation.mutate,
     register: registerMutation.mutate,
     logout: () => logoutMutation.mutate(),

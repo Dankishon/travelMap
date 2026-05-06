@@ -1,5 +1,5 @@
 """Роутер аутентификации"""
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.db.base import get_db
 from app.api.dependencies import get_current_user
@@ -44,4 +44,3 @@ def logout(current_user: User = Depends(get_current_user)):
 def get_current_user_info(current_user: User = Depends(get_current_user)):
     """Получить информацию о текущем пользователе"""
     return current_user
-

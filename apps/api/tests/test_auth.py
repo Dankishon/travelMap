@@ -1,7 +1,4 @@
 """Тесты для аутентификации"""
-import pytest
-from app.services.auth_service import AuthService
-from app.api.v1.schemas.auth import UserRegister, UserLogin
 
 
 def test_register_user(client, db):
@@ -12,6 +9,47 @@ def test_register_user(client, db):
     )
     assert response.status_code == 201
     assert response.json()["username"] == "testuser"
+
+
+def test_register_user_with_email(client, db):
+    """Тест регистрации пользователя с email"""
+    response = client.post(
+        "/api/v1/auth/register",
+        json={
+            "username": "testuser",
+            "password": "testpass123",
+            "email": "test@example.com"
+        }
+    )
+    assert response.status_code == 201
+    assert response.json()["username"] == "testuser"
+    assert response.json()["email"] == "test@example.com"
+
+
+def test_register_duplicate_username(client, db):
+    """Тест повторной регистрации с тем же username"""
+    client.post(
+        "/api/v1/auth/register",
+        json={"username": "testuser", "password": "testpass123"}
+    )
+
+    response = client.post(
+        "/api/v1/auth/register",
+        json={"username": "testuser", "password": "anotherpass"}
+    )
+
+    assert response.status_code == 400
+    assert response.json()["detail"] == "Пользователь с таким именем уже существует"
+
+
+def test_register_validation_error(client, db):
+    """Тест ошибки валидации при коротком username/password"""
+    response = client.post(
+        "/api/v1/auth/register",
+        json={"username": "ab", "password": "123"}
+    )
+
+    assert response.status_code == 422
 
 
 def test_login_user(client, db):

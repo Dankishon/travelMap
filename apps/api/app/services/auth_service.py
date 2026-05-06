@@ -1,13 +1,11 @@
 """Сервис аутентификации"""
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from datetime import timedelta
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.core.security import (
     verify_password, get_password_hash, create_access_token, create_refresh_token, decode_token
 )
-from app.core.config import settings
 from app.api.v1.schemas.auth import UserRegister, UserLogin, Token
 
 

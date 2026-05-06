@@ -1,6 +1,5 @@
 """Конфигурация приложения через Pydantic Settings"""
 from pydantic_settings import BaseSettings
-from typing import Optional
 
 
 class Settings(BaseSettings):
@@ -32,4 +31,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
