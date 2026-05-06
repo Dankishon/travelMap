@@ -5,6 +5,7 @@ WORKDIR /app
 # Установка зависимостей системы
 RUN apt-get update && apt-get install -y \
     postgresql-client \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Копирование requirements
@@ -20,4 +21,3 @@ ENV PYTHONPATH=/app
 
 # Команда по умолчанию
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
