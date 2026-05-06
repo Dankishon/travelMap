@@ -1,4 +1,4 @@
-/** Страница с маршрутами"""
+/** Страница с маршрутами */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { routesApi } from '@/features/routes/api/routesApi'
 import { useAuth } from '@/features/auth/hooks/useAuth'
@@ -86,4 +86,3 @@ export default function RoutesPage() {
     </div>
   )
 }
-

@@ -1,4 +1,4 @@
-/** Главный компонент приложения с роутингом"""
+/** Главный компонент приложения с роутингом */
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import LoginPage from '@/pages/LoginPage'
@@ -36,4 +36,3 @@ export default function App() {
     </Routes>
   )
 }
-

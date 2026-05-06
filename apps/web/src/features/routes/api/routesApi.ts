@@ -1,4 +1,4 @@
-/** API для маршрутов"""
+/** API для маршрутов */
 import apiClient from '@/shared/api/client'
 import { Route } from '@/shared/types'
 
@@ -32,4 +32,3 @@ export const routesApi = {
     await apiClient.delete(`/routes/${routeId}`)
   },
 }
-

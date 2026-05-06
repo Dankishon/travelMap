@@ -1,4 +1,4 @@
-/** API для аутентификации"""
+/** API для аутентификации */
 import apiClient from '@/shared/api/client'
 import { TokenResponse, User } from '@/shared/types'
 
@@ -46,4 +46,3 @@ export const authApi = {
     return response.data
   },
 }
-

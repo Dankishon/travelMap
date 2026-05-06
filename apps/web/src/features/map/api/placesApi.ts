@@ -1,4 +1,4 @@
-/** API для мест"""
+/** API для мест */
 import apiClient from '@/shared/api/client'
 import { Place } from '@/shared/types'
 
@@ -8,4 +8,3 @@ export const placesApi = {
     return response.data
   },
 }
-

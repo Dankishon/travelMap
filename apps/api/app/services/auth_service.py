@@ -48,8 +48,8 @@ class AuthService:
             )
         
         # Создаём токены
-        access_token = create_access_token(data={"sub": user.id})
-        refresh_token = create_refresh_token(data={"sub": user.id})
+        access_token = create_access_token(data={"sub": str(user.id)})
+        refresh_token = create_refresh_token(data={"sub": str(user.id)})
         
         return Token(
             access_token=access_token,
@@ -67,6 +67,20 @@ class AuthService:
             )
         
         user_id = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Недействительный refresh token"
+            )
+
+        try:
+            user_id = int(user_id)
+        except (TypeError, ValueError):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Недействительный refresh token"
+            )
+
         user = self.user_repo.get_by_id(self.db, user_id)
         if not user:
             raise HTTPException(
@@ -75,11 +89,10 @@ class AuthService:
             )
         
         # Создаём новый access token
-        access_token = create_access_token(data={"sub": user.id})
+        access_token = create_access_token(data={"sub": str(user.id)})
         
         return Token(
             access_token=access_token,
             refresh_token=refresh_token,  # Refresh token остаётся тем же
             token_type="bearer"
         )
-

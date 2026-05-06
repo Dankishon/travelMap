@@ -1,4 +1,4 @@
-/** Layout с навигацией"""
+/** Layout с навигацией */
 import { Outlet, Link, useLocation } from 'react-router-dom'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 
@@ -59,4 +59,3 @@ export default function Layout() {
     </div>
   )
 }
-

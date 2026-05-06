@@ -1,11 +1,11 @@
-/** Компонент карты с функционалом маршрутов"""
+/** Компонент карты с функционалом маршрутов */
 import { useEffect, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { placesApi } from '../api/placesApi'
 import { routesApi } from '@/features/routes/api/routesApi'
-import { Place, Route } from '@/shared/types'
+import { Place } from '@/shared/types'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 
 export default function MapView() {
@@ -274,4 +274,3 @@ export default function MapView() {
     </div>
   )
 }
-

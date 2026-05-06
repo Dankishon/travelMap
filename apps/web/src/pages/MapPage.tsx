@@ -1,7 +1,6 @@
-/** Страница с картой"""
+/** Страница с картой */
 import MapView from '@/features/map/components/MapView'
 
 export default function MapPage() {
   return <MapView />
 }
-

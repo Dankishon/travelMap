@@ -1,4 +1,4 @@
-/** Хук для работы с аутентификацией"""
+/** Хук для работы с аутентификацией */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { authApi, LoginRequest, RegisterRequest } from '../api/authApi'
@@ -51,4 +51,3 @@ export const useAuth = () => {
     error: loginMutation.error || registerMutation.error || logoutMutation.error,
   }
 }
-

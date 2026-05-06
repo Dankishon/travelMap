@@ -45,3 +45,45 @@ def test_login_wrong_password(client, db):
     )
     assert response.status_code == 401
 
+
+def test_get_current_user_with_access_token(client, db):
+    """Тест получения текущего пользователя по access token"""
+    client.post(
+        "/api/v1/auth/register",
+        json={"username": "testuser", "password": "testpass123"}
+    )
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"username": "testuser", "password": "testpass123"}
+    )
+    access_token = login_response.json()["access_token"]
+
+    response = client.get(
+        "/api/v1/auth/me",
+        headers={"Authorization": f"Bearer {access_token}"}
+    )
+
+    assert response.status_code == 200
+    assert response.json()["username"] == "testuser"
+
+
+def test_refresh_access_token(client, db):
+    """Тест обновления access token"""
+    client.post(
+        "/api/v1/auth/register",
+        json={"username": "testuser", "password": "testpass123"}
+    )
+    login_response = client.post(
+        "/api/v1/auth/login",
+        json={"username": "testuser", "password": "testpass123"}
+    )
+    refresh_token = login_response.json()["refresh_token"]
+
+    response = client.post(
+        "/api/v1/auth/refresh",
+        json={"refresh_token": refresh_token}
+    )
+
+    assert response.status_code == 200
+    assert "access_token" in response.json()
+    assert response.json()["refresh_token"] == refresh_token

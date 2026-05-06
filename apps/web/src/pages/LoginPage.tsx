@@ -1,4 +1,4 @@
-/** Страница входа/регистрации"""
+/** Страница входа/регистрации */
 import { useState } from 'react'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 
@@ -98,4 +98,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

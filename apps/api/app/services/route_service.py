@@ -2,6 +2,7 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from typing import List
+from app.models.route import Route
 from app.models.user import User
 from app.repositories.route_repository import RouteRepository
 from app.repositories.place_repository import PlaceRepository
@@ -80,4 +81,3 @@ class RouteService:
             )
         
         self.route_repo.delete(self.db, route)
-

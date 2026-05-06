@@ -1,4 +1,4 @@
-/** Утилиты для работы с localStorage"""
+/** Утилиты для работы с localStorage */
 
 export const storage = {
   get: (key: string): string | null => {
@@ -30,4 +30,3 @@ export const authStorage = {
     storage.remove('refresh_token')
   },
 }
-
